@@ -12,6 +12,7 @@
 
 .timeFrame{
     height: 60px;
+    margin-left: 100px;
 }
 
 .button{
@@ -28,5 +29,17 @@
     color: black;
     border: 2px solid #e7e7e7;
   }
-  
+  .buttonClicked{
+    padding: 10px 22px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    /* transition-duration: 0.4s; */
+    /* cursor: pointer; */
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+  }
   .button:hover {background-color: #e7e7e7;}

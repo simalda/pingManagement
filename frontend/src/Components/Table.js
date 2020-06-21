@@ -8,8 +8,7 @@ class Table extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            test: 'delete',
-            
+                  
             }
         }
 
@@ -23,7 +22,7 @@ class Table extends Component {
                 accessor: 'delete',
                 width: 150,
 
-                Cell: props => { return <img className='image' src={del} alt={"Delete"} h={( index)=>this.deleteItem( index)} /> }
+                Cell: props => { return <img className='image' src={del} alt={"Delete"}   /> }
             }
                 , {
                 Header: () => (
@@ -44,31 +43,18 @@ class Table extends Component {
             }]
         }
     
-    deleteItem(index) {
-        delete this.props.data[index]
-        this.setState({
-            ...this.state,
-            data: this.props.data,
-        test: "Sofa"
-
-        });
-    }
+    
     render() {
-        let tes  
-        if (this.state.test==="Sofa"){
-tes =   (
-<div>"Sofa"</div>
-)
- 
-        }
+         
         return <div className='table'>
-            {tes}
+             
             <ReactTable
             data={this.props.data}
             columns={this.getColumns()}
             showPagination={false}
             defaultPageSize={this.props.data.length}
             getTrProps={(state, rowInfo, column) => {
+                if (!rowInfo)      {return false}
                 return {
                     style: {
                         background: rowInfo.row.status === 'alive' ? '#bbcfb2' : '#cfbab2'
@@ -97,7 +83,7 @@ tes =   (
                     console.log("It was in this row:", rowInfo);
                     console.log("It was in this table instance:", instance);
                     if(column.id === "delete")(
-                        this.deleteItem(rowInfo.index)
+                        this.props.deleteItem(rowInfo.original.name)
                     )
                     // IMPORTANT! React-Table uses onClick internally to trigger
                     // events like expanding SubComponents and pivots.

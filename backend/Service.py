@@ -11,19 +11,59 @@ CORS(app)
 @app.route('/selectPings')
 def get_pings():
     sqlQuery = SQL()
-    return jsonify(sqlQuery.getPings())
-     
+    return jsonify(sqlQuery.getPings())   
 
 
 
  
 
-# @app.route('/stat/<user>', methods=['POST'])
-# def add_quiz(user):
+# @app.route('/createChartData')
+# def create_chart_data():
+#     sqlQuery = SQL()
+
+#     return jsonify(sqlQuery.getCharData())
+
+@app.route('/createChartData')
+def create_chart_data():
+    sqlQuery = SQL()
+    TableData = sqlQuery.getTableData()
+    print(TableData) 
+    TableDataInfo = []
+    for item in TableData:
+        status = sqlQuery.isAlive( item[1], item[3])
+        singlePing = {
+            "id": item[0],
+            "name": item[1],
+            "ping": item[2],
+            "time": item[3],
+            "status":  status
+        }
+        TableDataInfo.append(singlePing)
+    GraphData = sqlQuery.getCharData()
+    return jsonify({"TableData":TableDataInfo,
+    "GraphData":GraphData})
+
+@app.route('/pinger', methods=['POST'])
+def pingercallback():
+    data = json.loads(request.stream.read())
+    sqlQuery = SQL()
+    sqlQuery.addNewPings(data)
+    print(jsonify({'delay': sqlQuery.delay_time})
+)
+    return jsonify({'delay': sqlQuery.delay_time})
+
+# @app.route('/client/<user>', methods=['POST'])
+# def add_ping(user):
 #     data = json.loads(request.stream.read())
 #     sqlQuery = SQL()
-#     sqlQuery.addQuizToUSer(user, data)
+#     sqlQuery.addNewPings(data)
 #     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+@app.route('/delete/<name>')
+def delete_comp(name):
+    sqlQuery = SQL()
+    sqlQuery.deleteComp(name)   
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 # @app.route('/login/<user>/<password>')
@@ -38,20 +78,7 @@ def get_pings():
 #     return jsonify(sqlQuery.createUser(user, password))
 
 
-# @app.route('/stat/<user>')
-# def get_stat(user):
-#     sqlQuery = SQL()
-#     innerInfo = sqlQuery.getStatistic(user)
-#     questionInfo = []
-#     for c in innerInfo:
-#         singleQuestion = {
-#             "QuizId": c['QuizId'],
-#             "Question": c['Question'],
-#             "correctAnswer": c['correctAnswer'],
-#             "ChosenAnswerId": c['ChosenAnswerId'],
-#         }
-#         questionInfo.append(singleQuestion)
-#     return jsonify(questionInfo)
+
 
 
 # @app.route('/selectQuestions/<lang>/<numOfQuestions>')
