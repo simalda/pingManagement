@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 class SQL(object):
     def __init__(self):
-         self.delay_time =  5000
+         self.delay_time =  600
         #  timedelta(minutes=5)
          self.mydb = mysql.connector.connect(
             host="localhost",
@@ -19,7 +19,8 @@ class SQL(object):
     def addCompToDB(self, compName):
           mycursor = self.mydb.cursor()
           sql = "INSERT INTO ping_management.comps (compName)  VALUES (%s); "
-          val = (compName )
+          print(sql)
+          val = (compName,)#!!!
           print(val)
           mycursor.execute(sql, val)
           self.mydb.commit()
@@ -59,7 +60,7 @@ class SQL(object):
         mycursor = self.mydb.cursor()
         mycursor.execute("SELECT compName from ping_management.comps")
         distComps = mycursor.fetchall()#MITYA
-        print(distComps)
+        # print(distComps)
         return map(lambda item:''.join(item), distComps) 
         
 
@@ -68,7 +69,7 @@ class SQL(object):
     def getCharData(self):
         result = []        
         distComps = self.getAllComps()
-        print(distComps)
+        # print(distComps)
         for name in distComps:
               pingTimeArray = []
               compInfo = self.infoByComp(name)
@@ -81,7 +82,7 @@ class SQL(object):
                     # "timeStepsArray":timeStepsArray
                   }
                 )    
-        print(result)       
+        # print(result)       
         return result
 
     def getLastPing(self, compName):
@@ -93,7 +94,7 @@ class SQL(object):
     def getTableData(self):
         result = []
         distComps = self.getAllComps()
-        print(distComps)
+        # print(distComps)
         for name in distComps:
            result.append(self.getLastPing(name))
         return result
@@ -102,9 +103,8 @@ class SQL(object):
         mycursor = self.mydb.cursor()
         mycursor.execute("SELECT * FROM pings")
         myresult = mycursor.fetchall()
-        print(type(myresult))
-        for x in myresult:
-          print(x)
+        # for x in myresult:
+        #   print(x)
         return myresult   
 
 
@@ -114,9 +114,13 @@ class SQL(object):
           return mycursor.fetchall()
     
     def isAlive(self, compName, time):
-        return not timedelta(microseconds=4*self.delay_time).microseconds < (datetime.now() - time).microseconds
+        print('from is ALIVE')
+        print(str(timedelta(seconds=4*self.delay_time).total_seconds()))
+        print(str((datetime.now() - time).total_seconds()))
+        print( timedelta(seconds=4*self.delay_time).total_seconds() >= (datetime.now() - time).total_seconds())
+        return  timedelta(seconds=4*self.delay_time).total_seconds() >= (datetime.now() - time).total_seconds()
     
 
     
-s= SQL()
-s.addCompToDB('h' )
+# s= SQL()
+# s.addCompToDB('hhd' )

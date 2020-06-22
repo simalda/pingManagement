@@ -5,7 +5,6 @@ import '../CSS/graph.css'
 class Graph extends Component {
     constructor(props) {
         super(props)
-        // this.convertFromData()
         this.state = {
              
             

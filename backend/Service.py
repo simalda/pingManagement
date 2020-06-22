@@ -27,10 +27,13 @@ def get_pings():
 def create_chart_data():
     sqlQuery = SQL()
     TableData = sqlQuery.getTableData()
-    print(TableData) 
     TableDataInfo = []
     for item in TableData:
         status = sqlQuery.isAlive( item[1], item[3])
+        print('status from creactcharData')
+        print(status)
+        
+        # print(json.dumps(item[3]))
         singlePing = {
             "id": item[0],
             "name": item[1],
@@ -48,8 +51,7 @@ def pingercallback():
     data = json.loads(request.stream.read())
     sqlQuery = SQL()
     sqlQuery.addNewPings(data)
-    print(jsonify({'delay': sqlQuery.delay_time})
-)
+    print('PINGER:'+str(sqlQuery.delay_time))
     return jsonify({'delay': sqlQuery.delay_time})
 
 # @app.route('/client/<user>', methods=['POST'])
@@ -65,37 +67,6 @@ def delete_comp(name):
     sqlQuery.deleteComp(name)   
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
-
-# @app.route('/login/<user>/<password>')
-# def check_user(user, password):
-#     sqlQuery = SQL()
-#     return jsonify(sqlQuery.checkUser(user, password))
-
-
-# @app.route('/signUp/<user>/<password>')
-# def create_user(user, password):
-#     sqlQuery = SQL()
-#     return jsonify(sqlQuery.createUser(user, password))
-
-
-
-
-
-# @app.route('/selectQuestions/<lang>/<numOfQuestions>')
-# def get_questions(lang, numOfQuestions):
-#     sqlQuery = SQL()
-#     innerInfo = sqlQuery.SelectQuestionsforQuiz(lang, numOfQuestions)
-#     questionInfo = []
-#     for c in innerInfo:
-#         singleQuestion = {
-#             "question": c['question'],
-#             "correctAnswer": c['correctAnswer'],
-#             "answerOptions": [[c['answer1'][0], c['answer1'][1]], [c['answer2'][0], c['answer2'][1]], [c['answer3'][0], c['answer3'][1]], [c['answer4'][0], c['answer4'][1]]],
-#             "questionId": c['questionId'],
-#             "chosenAnswer": ""
-#         }
-#         questionInfo.append(singleQuestion)
-#     return jsonify(questionInfo)
 
 
 if __name__ == "__main__":

@@ -21,13 +21,13 @@ class StartPage extends React.Component {
       isError: false,
       data: [],
       charData: {},
-      DateFilter: AllDateOption,
+      DateFilter: DayDateOption,
     };
   }
 
   componentDidMount() {
     this.updateData();
-    var myVar = setInterval(this.myTimer, 60000);
+    var myVar = setInterval(()=>this.myTimer(), 60000);
   }
 
   updateData() {
@@ -44,7 +44,9 @@ class StartPage extends React.Component {
       () => this.setState({ ...this.state, isError: true })
     );
   }
+
  myTimer() {
+     console.log("Timer called")
      this.updateData()
   }
 
@@ -80,8 +82,9 @@ class StartPage extends React.Component {
       b = this.creatNewRGB(r, g, b)[2];
       var dataForPing = [];
       item["pingTimeArrray"].forEach((item) => {
+        console.log(item[1])
         dataForPing.push({
-          x: moment(item[1]).format("YYYY-MM-DD HH:mm:ss"),
+          x: moment(item[1]).local().toISOString(),
           y: item[0],
         });
       });
@@ -227,7 +230,7 @@ class StartPage extends React.Component {
 
   handleData(result) {
     return result.map((item) => ({
-      status: item["status"] === 1 ? "alive" : "dead",
+      status: item["status"] === true ? "alive" : "dead",
       ping: item["ping"],
       name: item["name"],
       id: item["id"],
