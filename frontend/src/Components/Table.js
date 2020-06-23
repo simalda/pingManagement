@@ -52,7 +52,7 @@ class Table extends Component {
             data={this.props.data}
             columns={this.getColumns()}
             showPagination={false}
-            defaultPageSize={this.props.data.length}
+            pageSize={this.props.data.length}
             getTrProps={(state, rowInfo, column) => {
                 if (!rowInfo)      {return false}
                 return {

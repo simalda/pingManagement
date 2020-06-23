@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 
 out_url = "http://127.0.0.1:5000/pinger"
-test_url = "www.facebook.com"
+test_url = "www.calorizator.ru"
 my_delay = 50
 
 while True:
@@ -25,4 +25,4 @@ while True:
     # test_url    =   result['test_url']
     print('sent')
             
-    time.sleep(my_delay)
+    time.sleep(my_delay) 

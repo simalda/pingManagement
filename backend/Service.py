@@ -2,6 +2,7 @@
 from flask import Flask, jsonify, request, json
 from datetime import datetime
 from flask_cors import CORS
+from urllib.parse import urlparse
 from DB import *
 import json
 app = Flask(__name__)
@@ -61,11 +62,13 @@ def pingercallback():
 #     sqlQuery.addNewPings(data)
 #     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
-@app.route('/delete/<name>')
+@app.route('/delete/<path:name>')
 def delete_comp(name):
     sqlQuery = SQL()
-    sqlQuery.deleteComp(name)   
-    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    print(name)
+    if sqlQuery.deleteComp(name):   
+        return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+    return 
 
 
 

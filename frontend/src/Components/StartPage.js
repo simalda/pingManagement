@@ -11,6 +11,7 @@ const AllDateOption = "ALL";
 const YearDateOption = "YEAR";
 const MonthDateOption = "MONTH";
 const DayDateOption = "DAY";
+const HourDateOption = "HOUR";
 class StartPage extends React.Component {
   constructor(props) {
     super(props);
@@ -82,7 +83,6 @@ class StartPage extends React.Component {
       b = this.creatNewRGB(r, g, b)[2];
       var dataForPing = [];
       item["pingTimeArrray"].forEach((item) => {
-        console.log(item[1])
         dataForPing.push({
           x: moment(item[1]).local().toISOString(),
           y: item[0],
@@ -97,7 +97,6 @@ class StartPage extends React.Component {
         borderWidth: 2,
         data: dataForPing,
 
-        // data: item["pingArrray"],
       });
     });
     const scales = this.getScales();
@@ -174,7 +173,7 @@ class StartPage extends React.Component {
         ],
       };
     }
-    if (this.state.DateFilter === YearDateOption) {
+    else if (this.state.DateFilter === YearDateOption) {
       return {
         xAxes: [
           {
@@ -226,6 +225,24 @@ class StartPage extends React.Component {
         ],
       };
     }
+    else if (this.state.DateFilter === HourDateOption) {
+      return {
+        xAxes: [
+          {
+            type: "time",
+            time: {
+              parser: "YYYY-MM-DD HH:mm:ss",
+              unit: "minute",
+              displayFormats: {
+                day: "mm",
+              },
+              min: moment().subtract(1, "hours"),
+              max: Date.now(),
+            },
+          },
+        ],
+      };
+    }
   }
 
   handleData(result) {
@@ -237,8 +254,19 @@ class StartPage extends React.Component {
     }));
   }
 
+
+  closeModal() {
+    this.updateData();
+  }
+
+  openModal(delRes) {
+    this.setState({
+      visible: true,
+      deleteResult: delRes,
+    });
+  }
   renderButtons() {
-    const texts = ["ALL", "YEAR", "MONTH", "DAY"];
+    const texts = ["ALL", "YEAR", "MONTH", "DAY","HOUR"];
     const buttons = texts.map((text) => (
       <button
         key={text}
@@ -255,16 +283,6 @@ class StartPage extends React.Component {
     return <>{buttons}</>;
   }
 
-  openModal(delRes) {
-    this.setState({
-      visible: true,
-      deleteResult: delRes,
-    });
-  }
-
-  closeModal() {
-    this.updateData();
-  }
 
   render() {
     if (this.state.isError) {

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 class SQL(object):
     def __init__(self):
-         self.delay_time =  600
+         self.delay_time =  60
         #  timedelta(minutes=5)
          self.mydb = mysql.connector.connect(
             host="localhost",
@@ -33,7 +33,8 @@ class SQL(object):
         distComps = self.getAllComps()
         if compName not in distComps:
           self.addCompToDB(compName)
-        self.addPingToDB(compName, ping, timeStem)
+        if ping:
+          self.addPingToDB(compName, ping, timeStem)
 
     def addPingToDB(self,compName, ping, timeStem):
         mycursor = self.mydb.cursor()
@@ -43,22 +44,26 @@ class SQL(object):
         self.mydb.commit()
         print(mycursor.rowcount, "record inserted.")
 
+ 
     def deleteComp(self, compName):        #letaken
         mycursor = self.mydb.cursor()
-        sql = "DELETE FROM pings WHERE compName = \'" + compName + "\'"
-        mycursor.execute(sql)
+        sql = "DELETE FROM pings WHERE compName = %s"
+        val = (str(compName),)
+        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'+str(compName))
+        mycursor.execute(sql, val)
         self.mydb.commit()
         print(mycursor.rowcount, "record(s) deleted")
         mycursor2 = self.mydb.cursor()
-        sql2 = "DELETE FROM comps WHERE compName = \'" + compName + "\'"
-        mycursor2.execute(sql2)
+        sql2 = "DELETE FROM comps WHERE compName = %s"
+        val = (str(compName),)
+        mycursor2.execute(sql2, val)
         self.mydb.commit()
-        print(mycursor.rowcount, "record(s) deleted")
+        return mycursor.rowcount 
 
 
     def getAllComps(self):        
         mycursor = self.mydb.cursor()
-        mycursor.execute("SELECT compName from ping_management.comps")
+        mycursor.execute("SELECT compName from ping_management.comps ORDER BY id")
         distComps = mycursor.fetchall()#MITYA
         # print(distComps)
         return map(lambda item:''.join(item), distComps) 
