@@ -43,3 +43,9 @@
     border: 2px solid black;
   }
   .button:hover {background-color: #e7e7e7;}
+.modal{
+    background-color: rgb(230, 240, 236);
+    margin-left: auto;
+    width: 100%;
+    height: 100%;
+}

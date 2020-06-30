@@ -4,14 +4,9 @@ import "../CSS/graph.css";
 import Graph from "./Graph";
 import Table from "./Table";
 import Modal from "react-awesome-modal";
-import momemt from "moment";
-import * as moment from "moment";
-
-const AllDateOption = "ALL";
-const YearDateOption = "YEAR";
-const MonthDateOption = "MONTH";
-const DayDateOption = "DAY";
-const HourDateOption = "HOUR";
+import * as proxy from "../JS/proxy";
+import {datePeriod} from "../JS/config"
+ 
 class StartPage extends React.Component {
   constructor(props) {
     super(props);
@@ -22,25 +17,25 @@ class StartPage extends React.Component {
       isError: false,
       data: [],
       charData: {},
-      DateFilter: DayDateOption,
+      DateFilter: datePeriod.DayDateOption
     };
   }
 
   componentDidMount() {
     this.updateData();
-    var myVar = setInterval(()=>this.myTimer(), 60000);
+    setInterval(()=>this.myTimer(), 60000);
   }
 
   updateData() {
-    this.getChartData().then(
+    proxy.getChartData().then(
       (result) =>
         this.setState({
           ...this.state,
           isLoadComplete: true,
           visible: false,
           deleteResult: "",
-          data: this.handleData(result["TableData"]),
-          chartData: this.creatCompDatasets(result["GraphData"]),
+          data:  result["TableData"],
+          chartData: result["GraphData"],
         }),
       () => this.setState({ ...this.state, isError: true })
     );
@@ -50,96 +45,7 @@ class StartPage extends React.Component {
      console.log("Timer called")
      this.updateData()
   }
-
  
-
-  getData() {
-    return fetch(`http://127.0.0.1:5000/selectPings`, {}).then((response) =>
-      response.json()
-    );
-  }
-
-  getChartData() {
-    return fetch(`http://127.0.0.1:5000/createChartData`, {}).then((response) =>
-      response.json()
-    );
-  }
-
-  deletePing(name) {
-    var nameEncoded = encodeURIComponent(name);
-    return fetch(
-      `http://127.0.0.1:5000/delete/${nameEncoded}`
-    ).then((response) => response.json());
-  }
-
-  creatCompDatasets(result) {
-    let dataSets = [];
-    let r = 0;
-    let g = 0;
-    let b = 0;
-    result.forEach((item) => {
-      r = this.creatNewRGB(r, g, b)[0];
-      g = this.creatNewRGB(r, g, b)[1];
-      b = this.creatNewRGB(r, g, b)[2];
-      var dataForPing = [];
-      item["pingTimeArrray"].forEach((item) => {
-        dataForPing.push({
-          x: moment(item[1]).local().toISOString(),
-          y: item[0],
-        });
-      });
-      dataSets.push({
-        label: item["compName"],
-        fill: false,
-        lineTension: 0.5,
-        backgroundColor: "rgba(75,192,192,1)",
-        borderColor: "rgba(" + r + "," + g + "," + b + ",0.5)",
-        borderWidth: 2,
-        data: dataForPing,
-
-      });
-    });
-    const scales = this.getScales();
-    dataSets = this.chartData(scales, dataSets);
-
-    return dataSets;
-  }
-
-  creatNewRGB(r, g, b) {
-    r = r + 25;
-    g = g + 50;
-    b = b + 100;
-    if (r + 25 > 256) {
-      r = r % 256;
-    } else if (g + 50 > 256) {
-      g = g % 256;
-    } else if (b + 100 > 256) {
-      b = b % 256;
-    }
-    return [r, g, b];
-  }
-
-  chartData(scale, dataSets) {
-    var options = {
-      scales: scale,
-      title: {
-        display: true,
-        text: "Ping live cycle",
-        fontSize: 20,
-      },
-      legend: {
-        display: true,
-        position: "right",
-      },
-      maintainAspectRatio: false,
-    };
-
-    return {
-      options: options,
-      datasets: dataSets,
-    };
-  }
-
   dateButtonClicked(text) {
     this.setState({
       ...this.state,
@@ -149,111 +55,11 @@ class StartPage extends React.Component {
   }
 
   deleteItem(name) {
-    this.deletePing(name).then(
+    proxy.deleteComp(name).then(
       () => this.openModal("Succses"),
       () => this.openModal("Fail")
     );
   }
-
-  getScales() {
-    if (this.state.DateFilter === AllDateOption) {
-      return {
-        xAxes: [
-          {
-            type: "time",
-            time: {
-              parser: "YYYY-MM-DD HH:mm:ss",
-              unit: "year",
-              displayFormats: {
-                day: "MM",
-              },
-              max: Date.now(),
-            },
-          },
-        ],
-      };
-    }
-    else if (this.state.DateFilter === YearDateOption) {
-      return {
-        xAxes: [
-          {
-            type: "time",
-            time: {
-              parser: "YYYY-MM-DD HH:mm:ss",
-              unit: "year",
-              displayFormats: {
-                day: "DD/MM",
-              },
-              min: moment().subtract(365, "days"),
-              max: Date.now(),
-            },
-          },
-        ],
-      };
-    } else if (this.state.DateFilter === MonthDateOption) {
-      return {
-        xAxes: [
-          {
-            type: "time",
-            time: {
-              parser: "YYYY-MM-DD HH:mm:ss",
-              unit: "day",
-              displayFormats: {
-                day: "DD/MM",
-              },
-              min: moment().subtract(30, "days"),
-              max: Date.now(),
-            },
-          },
-        ],
-      };
-    } else if (this.state.DateFilter === DayDateOption) {
-      return {
-        xAxes: [
-          {
-            type: "time",
-            time: {
-              parser: "YYYY-MM-DD HH:mm:ss",
-              unit: "hour",
-              displayFormats: {
-                day: "HH/mm",
-              },
-              min: moment().subtract(1, "days"),
-              max: Date.now(),
-            },
-          },
-        ],
-      };
-    }
-    else if (this.state.DateFilter === HourDateOption) {
-      return {
-        xAxes: [
-          {
-            type: "time",
-            time: {
-              parser: "YYYY-MM-DD HH:mm:ss",
-              unit: "minute",
-              displayFormats: {
-                day: "mm",
-              },
-              min: moment().subtract(1, "hours"),
-              max: Date.now(),
-            },
-          },
-        ],
-      };
-    }
-  }
-
-  handleData(result) {
-    return result.map((item) => ({
-      status: item["status"] === true ? "alive" : "dead",
-      ping: item["ping"],
-      name: item["name"],
-      id: item["id"],
-    }));
-  }
-
 
   closeModal() {
     this.updateData();
@@ -266,7 +72,13 @@ class StartPage extends React.Component {
     });
   }
   renderButtons() {
-    const texts = ["ALL", "YEAR", "MONTH", "DAY","HOUR"];
+    const texts = [
+      datePeriod.AllDateOption, 
+      datePeriod.YearDateOption,
+      datePeriod.MonthDateOption, 
+      datePeriod.DayDateOption,
+      datePeriod.HourDateOption
+    ];
     const buttons = texts.map((text) => (
       <button
         key={text}
@@ -282,7 +94,6 @@ class StartPage extends React.Component {
     ));
     return <>{buttons}</>;
   }
-
 
   render() {
     if (this.state.isError) {
@@ -307,13 +118,12 @@ class StartPage extends React.Component {
           ></Table>
           <Modal
             visible={this.state.visible}
-            width="400"
-            height="300"
-            backgroundColor="beige"
+            width="300"
+            height="200"            
             effect="fadeInUp"
-            onClickAway={() => this.closeModal()}
+            // onClickAway={() => this.closeModal()}
           >
-            <div>
+            <div className='modal'>
               <h1>Delete report</h1>
               <p>{this.state.deleteResult}</p>
               <a href="javascript:void(0);" onClick={() => this.closeModal()}>

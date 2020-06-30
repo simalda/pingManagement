@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 
 out_url = "http://127.0.0.1:5000/pinger"
-test_url = "www.calorizator.ru"
+test_url = "www.facebook.com"
 my_delay = 50
 
 while True:
