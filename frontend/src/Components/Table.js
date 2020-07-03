@@ -9,12 +9,7 @@ class Table extends Component {
       data: [],
     };
   }
-//   componentDidMount() {
-//     this.setState({
-//       ...this.state,
-//       data: this.handleData(),
-//     });
-//   }
+
   getColumns() {
     return [
       {

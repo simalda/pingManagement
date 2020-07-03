@@ -1,6 +1,9 @@
 import mysql.connector
 from datetime import datetime, timedelta
 import config as conf
+import logging
+
+logger = logging.getLogger(__name__)
 
 class dataAccess(object):
     def __init__(self):
@@ -12,78 +15,62 @@ class dataAccess(object):
           )
 
     def addCompToDB(self, compName):
+      try:
+          logger.info('In FUNCTION %s data before insert: %s', 'addCompToDB', compName)
           mycursor = self.mydb.cursor()
           sql = "INSERT INTO ping_management.comps (compName)  VALUES (%s); "
           val = (compName,) 
           mycursor.execute(sql, val)
           self.mydb.commit()
-          print(mycursor.rowcount, "record inserted.")
+          logger.info('In FUNCTION %s number of record inserted: %s', 'addCompToDB', mycursor.rowcount)
+      except Exception as e:
+          logger.error('In FUNCTION %s exception raised: %s', 'addCompToDB', e)  
+          raise
 
     def addNewPings(self, data):
-        mycursor = self.mydb.cursor()
-        compName = data['test_url']#!??
-        ping = data['ping']#!??
-        timeStem = datetime.now()
-        if not ping:
-            ping = 0
-        args = [compName, ping, timeStem]
-        result_args = mycursor.callproc('ping_management.add', args)
-        
+      try:
+          mycursor = self.mydb.cursor()
+          compName = data['test_url']#!??
+          ping = data['ping']#!??
+          timeStem = datetime.now()
+          if not ping:
+              ping = 0
+          args = [compName, ping, timeStem]
+          logger.info('In FUNCTION %s data before insert: %s\n', 'addNewPings', args)
+          result_args = mycursor.callproc('ping_management.add', args)
+          logger.info('In FUNCTION %s data before insert: %s\n', 'addNewPings', result_args)
+      except Exception as e:
+          logger.error('In FUNCTION %s exception raised: %s', 'addNewPings', e)  
+          raise
 
-    # def addPingToDB(self,compName, ping, timeStem):
-    #     mycursor = self.mydb.cursor()
-    #     sql = "INSERT INTO ping_management.pings (compName, ping, timeOfResponce)  VALUES (%s, %s, %s); "
-    #     val = (compName, ping, timeStem)
-    #     mycursor.execute(sql, val)
-    #     self.mydb.commit()
-    #     print(mycursor.rowcount, "record inserted.")
- 
-    def deleteComp(self, compName):       
+    def deleteComp(self, compName):
+      try:  
         mycursor = self.mydb.cursor()
-        args = [compName]
-        print('comp name '+compName)
+        args = [compName, 0]
+        logger.info('In FUNCTION %s data before delete: %s\n', 'deleteComp', args)
         result_args = mycursor.callproc('ping_management.delete', args)
-        for result in mycursor.stored_results():
-          print (result.fetchall())
-        print(result_args)
-        print(mycursor.rowcount)
-        return mycursor.rowcount 
+        logging.info('In FUNCTION %s data after insert: %s\n', 'deleteComp', result_args)
+        return result_args[1] 
+      except Exception as e:
+          logger.error('In FUNCTION %s exception raised: %s', 'deleteComp', e)  
+          raise
 
-    # def getAllComps(self):        
-    #     mycursor = self.mydb.cursor()
-    #     mycursor.execute("SELECT compName from ping_management.comps ORDER BY id")
-    #     distComps = mycursor.fetchall()
-    #     return map(lambda item:''.join(item), distComps) 
-
-    def getAllPings(self):        
+    def getAllPings(self):
+      try:      
         mycursor = self.mydb.cursor()
         mycursor.execute("SELECT * FROM ping_management.pings")
         allPings = mycursor.fetchall() 
         return allPings
+      except Exception as e:
+          logger.error('In FUNCTION %s exception raised: %s', 'getAllPings', e)  
+          raise
 
-    # def getLastPing(self, compName):
-    #     mycursor = self.mydb.cursor()
-    #     mycursor.execute("SELECT * from ping_management.pings where compName =\'"+compName+"\' ORDER BY timeOfResponce DESC LIMIT 1")
-    #     return mycursor.fetchone()
-
-    # def getTableData(self):
-    #     result = []
-    #     distComps = self.getAllComps()
-    #     # print(distComps)
-    #     for name in distComps:
-    #        result.append(self.getLastPing(name))
-    #     return result
-        
  
-
-    # def infoByComp(self, compName):
-    #       mycursor = self.mydb.cursor()
-    #       mycursor.execute("SELECT compName,ping, timeOfResponce from ping_management.pings where compName =\'"+compName+"\' ORDER BY timeOfResponce ASC") 
-    #       return mycursor.fetchall()
     
 
     
 
-    
+
+
 # s= dataAccess()
-# s.getAllPings()
+# s.deleteComp('www.calorizator.ru')

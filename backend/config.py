@@ -1,6 +1,3 @@
-
-
-#class 
 mysql = {
     "host": "localhost",
     "user":"roma",
@@ -9,5 +6,3 @@ mysql = {
 }
 
 delay_time = 600
-# compNameFromClient = ''
-# pingFromClient = 0

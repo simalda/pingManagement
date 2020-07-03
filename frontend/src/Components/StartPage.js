@@ -17,7 +17,8 @@ class StartPage extends React.Component {
       isError: false,
       data: [],
       charData: {},
-      DateFilter: datePeriod.DayDateOption
+      DateFilter: datePeriod.DayDateOption,
+      status:''
     };
   }
 
@@ -26,9 +27,10 @@ class StartPage extends React.Component {
     setInterval(()=>this.myTimer(), 60000);
   }
 
+ 
   updateData() {
     proxy.getChartData().then(
-      (result) =>
+      (result) =>{
         this.setState({
           ...this.state,
           isLoadComplete: true,
@@ -36,10 +38,35 @@ class StartPage extends React.Component {
           deleteResult: "",
           data:  result["TableData"],
           chartData: result["GraphData"],
-        }),
-      () => this.setState({ ...this.state, isError: true })
-    );
-  }
+        })}).catch((error)=>   {
+          if(typeof error.text === 'function'){
+            error.text().then(erMes=> this.setState({ ...this.state, isError: true, status:erMes  }) 
+              )
+          }
+          else{
+          this.setState({ ...this.state, isError: true, status:error.toString() })    }
+              })
+            }
+  
+  // updateData() {
+  //   proxy.getChartData().then(
+  //     (result) =>{
+  //       if(result.isGood){
+  //     console.log(result)
+  //       this.setState({
+  //         ...this.state,
+  //         isLoadComplete: true,
+  //         visible: false,
+  //         deleteResult: "",
+  //         data:  result.value["TableData"],
+  //         chartData: result.value["GraphData"],
+  //       })}
+  //       else{
+  //         this.setState({ ...this.state, isError: true, status: result.error  })    
+  //       }
+  //     }
+  //   );
+  // }
 
  myTimer() {
      console.log("Timer called")
@@ -56,10 +83,18 @@ class StartPage extends React.Component {
 
   deleteItem(name) {
     proxy.deleteComp(name).then(
-      () => this.openModal("Succses"),
-      () => this.openModal("Fail")
-    );
-  }
+      () => this.openModal("Success")
+      ).catch((error)=>   {
+          if(typeof error.text === 'function'){
+            error.text().then(
+              () => this.openModal("Fail")
+              )
+          }
+          else{
+          this.setState({ ...this.state, isError: true, status:error.toString() })    }
+              })
+            } 
+ 
 
   closeModal() {
     this.updateData();
@@ -97,7 +132,7 @@ class StartPage extends React.Component {
 
   render() {
     if (this.state.isError) {
-      return <div>Error</div>;
+      return <div>{this.state.status}</div>;
     } else if (!this.state.isLoadComplete) {
       return <div>Loading.....</div>;
     } else {
@@ -119,9 +154,8 @@ class StartPage extends React.Component {
           <Modal
             visible={this.state.visible}
             width="300"
-            height="200"            
+            height="180"            
             effect="fadeInUp"
-            // onClickAway={() => this.closeModal()}
           >
             <div className='modal'>
               <h1>Delete report</h1>

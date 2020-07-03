@@ -1,60 +1,57 @@
+import logging
+import logging.handlers
+from concurrent_log_handler import ConcurrentRotatingFileHandler
+
 from flask import Flask, jsonify, request, json
 from datetime import datetime
 from flask_cors import CORS
 from urllib.parse import urlparse
+
 import config as conf
 from DB import *
 from BisnessLogic import *
-import json
+
 app = Flask(__name__)
 app.debug = True
 CORS(app) 
 
-# @app.route('/selectPings')
-# def get_pings():
-#     sqlQuery = dataAccess()
-#     return jsonify(sqlQuery.getPings())   
+handler = ConcurrentRotatingFileHandler('Log/log', maxBytes=10*1024*1024, backupCount=5)
+logging.basicConfig( level=logging.DEBUG, handlers=[handler],format='%(asctime)s %(name)-12s %(levelname)-8s %(message)-3000s',
+                    datefmt='%d-%m-%y %H:%M')
 
-# @app.route('/createChartData')
-# def create_chart_data():
-#     sqlQuery = dataAccess()
-#     TableData = sqlQuery.getTableData()
-#     TableDataInfo = []
-    
-#     for item in TableData:
-#         status = sqlQuery.isAlive( item[1], item[3])
-        
-#         singlePing = {
-#             "id": item[0],
-#             "name": item[1],
-#             "ping": item[2],
-#             "time": item[3],
-#             "status":  status
-#         }
-#         TableDataInfo.append(singlePing)
-#     GraphData = sqlQuery.getChartData()
-#     return jsonify({"TableData":TableDataInfo,
-#     "GraphData":GraphData})
+logger = logging.getLogger(__name__)
 
 @app.route('/createChartData')
 def create_chart_data():
-    blItem = BLogic()
-    data = blItem.createDataTableAndGraph()
-    return jsonify({"TableData":data["TableData"],  "GraphData":data["GraphData"]})
+    try:
+        blItem = BLogic()
+        data = blItem.createDataTableAndGraph()
+        logger.info('%s how data looks  before you send it to front: %.3000s\n', '/createChartData',data )
+        jsonData = jsonify({"TableData":data["TableData"],  "GraphData":data["GraphData"]})
+        return jsonData
+    except Exception as ex:
+        logger.error('%s the following exeption  appeared: %s\n', '/createChartData',ex )
+        raise
 
 @app.route('/pinger', methods=['POST'])
 def pingercallback():
-    data = json.loads(request.stream.read())
-    sqlQuery = dataAccess()
-    sqlQuery.addNewPings(data)
-    return jsonify({'delay': conf.delay_time})
-
+    try:
+        data = json.loads(request.stream.read())
+        logger.info('%s how data looks  when it comes from client:%s\n', '/pinger', data )
+        sqlQuery = dataAccess()
+        sqlQuery.addNewPings(data)
+        logger.info('%s how data looks  before you send it back to client: %s\n', '/pinger', data )
+        return jsonify({'delay': conf.delay_time})
+    except Exception as ex:
+        logger.error('%s the following exeption  appeared: %s\n', '/pinger',ex )
+        raise
 @app.route('/delete/<path:name>')
 def delete_comp(name):
+    logger.info('%s how data looks  before you send it to db to delete:%s\n', '/delete', name )
     sqlQuery = dataAccess()
     if sqlQuery.deleteComp(name):   
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
-    return False
+    return json.dumps({'success': False}), 500, {'ContentType': 'application/json'}
 
 if __name__ == "__main__":
     app.run(port=5000)
