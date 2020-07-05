@@ -30,11 +30,9 @@ class dataAccess(object):
     def addNewPings(self, data):
       try:
           mycursor = self.mydb.cursor()
-          compName = data['test_url']#!??
+          compName = data['hostname']#!??
           ping = data['ping']#!??
           timeStem = datetime.now()
-          if not ping:
-              ping = 0
           args = [compName, ping, timeStem]
           logger.info('In FUNCTION %s data before insert: %s\n', 'addNewPings', args)
           result_args = mycursor.callproc('ping_management.add', args)

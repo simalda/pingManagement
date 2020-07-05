@@ -37,6 +37,10 @@ def create_chart_data():
 def pingercallback():
     try:
         data = json.loads(request.stream.read())
+        if not isPingerValid(data):
+            print('fuck %s', data)
+            logger.error('pinger validation failed for %s', data)
+            return json.dumps({'success': False}), 400, {'ContentType': 'application/json'}
         logger.info('%s how data looks  when it comes from client:%s\n', '/pinger', data )
         sqlQuery = dataAccess()
         sqlQuery.addNewPings(data)
@@ -45,6 +49,7 @@ def pingercallback():
     except Exception as ex:
         logger.error('%s the following exeption  appeared: %s\n', '/pinger',ex )
         raise
+
 @app.route('/delete/<path:name>')
 def delete_comp(name):
     logger.info('%s how data looks  before you send it to db to delete:%s\n', '/delete', name )
@@ -52,6 +57,10 @@ def delete_comp(name):
     if sqlQuery.deleteComp(name):   
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
     return json.dumps({'success': False}), 500, {'ContentType': 'application/json'}
+
+def isPingerValid(data):
+    return data['ping'] and  type(data['ping']) == float and data['hostname'] and \
+        type (data['hostname']) == str
 
 if __name__ == "__main__":
     app.run(port=5000)

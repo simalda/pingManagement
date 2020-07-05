@@ -48,25 +48,7 @@ class StartPage extends React.Component {
               })
             }
   
-  // updateData() {
-  //   proxy.getChartData().then(
-  //     (result) =>{
-  //       if(result.isGood){
-  //     console.log(result)
-  //       this.setState({
-  //         ...this.state,
-  //         isLoadComplete: true,
-  //         visible: false,
-  //         deleteResult: "",
-  //         data:  result.value["TableData"],
-  //         chartData: result.value["GraphData"],
-  //       })}
-  //       else{
-  //         this.setState({ ...this.state, isError: true, status: result.error  })    
-  //       }
-  //     }
-  //   );
-  // }
+ 
 
  myTimer() {
      console.log("Timer called")
