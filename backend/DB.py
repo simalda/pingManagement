@@ -57,15 +57,22 @@ class dataAccess(object):
       try:      
         mycursor = self.mydb.cursor()
         mycursor.execute("SELECT * FROM ping_management.pings")
-        allPings = mycursor.fetchall() 
+        allPingsTuples = mycursor.fetchall()
+        allPings = list(map(lambda ping: Ping(ping[0], ping[1], ping[2], ping[3]),allPingsTuples) )
         return allPings
       except Exception as e:
           logger.error('In FUNCTION %s exception raised: %s', 'getAllPings', e)  
           raise
 
- 
-    
+class Ping(object):
+  def __init__(self, id, compName, pingValue, time):
+    self.id = id
+    self.compName = compName
+    self.pingValue = pingValue
+    self.time = time
 
+  def __str__(self):
+    return "id -- {id}, compName -- {comp}, pingValue -- {value}".format(id=self.id, comp=self.compName, value = self.pingValue) 
     
 
 

@@ -3,16 +3,12 @@ from DB import *
 import config as conf
 import logging
 import pytz
+import json
 logger = logging.getLogger(__name__)
 
 
 class BLogic(object):
-    def __init__(self):
-        self.lastPing = -1
-        self.id = 0
-        self.compName = 1
-        self.pingValue = 2
-        self.time = 3
+    
 
     def createDataTableAndGraph(self):
         try:
@@ -39,26 +35,20 @@ class BLogic(object):
 
     def getTableData(self, data):
         try:
-            TableDataInfo = []
-            distComps = self.sortDataFromDB(data)
-            for compName in distComps.keys():
-                distComps[compName].sort(key=lambda x: x[self.time])
-                status = 'alive' if self.isAlive(
-                    distComps[compName][self.lastPing][self.time]) else 'dead'
-                singlePing = {
-                    "id": distComps[compName][self.lastPing][self.id],
-                    "name": distComps[compName][self.lastPing][self.compName],
-                    "ping": distComps[compName][self.lastPing][self.pingValue],
-                    "time": distComps[compName][self.lastPing][self.time],
-                    "status":  status
-
-                }
-                print(distComps[compName][self.lastPing][self.time])
-                print(type(distComps[compName][self.lastPing][self.time]))
-                TableDataInfo.append(singlePing)
-            logger.info('In FUNCTION %s data before \'return\': %.3000s\n',
-                        'getTableData', TableDataInfo)
-            return TableDataInfo
+            dictComps = self.sortDataFromDB(data)
+          
+            def getCompInfo(compNamePings):
+                compName, pings = compNamePings
+                pings.sort(key=lambda ping: ping.time)
+                lastPing = pings[-1]
+                return CompInfo(
+                    lastPing.id,
+                    lastPing.compName,
+                    lastPing.pingValue,
+                    lastPing.time ,
+                    'alive' if self.isAlive(lastPing.time) else 'dead'                  
+                ).dictionary() 
+            return list(map(getCompInfo, dictComps.items()))
         except Exception as e:
             logger.error('In FUNCTION %s exception raised: %s',
                          'getTableData', e)
@@ -70,10 +60,10 @@ class BLogic(object):
             distComps = self.sortDataFromDB(data)
             for compName in distComps.keys():
                 pingTimeArray = []
-                distComps[compName].sort(key=lambda x: x[self.time])
+                distComps[compName].sort(key=lambda x: x.time)
                 for item in distComps[compName]:
                     pingTimeArray.append(
-                        (item[self.pingValue], item[self.time].astimezone(pytz.utc)))
+                        (item.pingValue, item.time.astimezone(pytz.utc)))
                 result.append(
                     {
                         "compName": compName,
@@ -90,16 +80,26 @@ class BLogic(object):
 
     def sortDataFromDB(self, data):
         try:
-            dataDict = {}
-            for ping in data:
-                if ping[self.compName] not in dataDict.keys():
-                    dataDict[ping[self.compName]] = [ping]
-                else:
-                    dataDict[ping[self.compName]].append(ping)
-            logger.info(
-                'In FUNCTION %s data before \'return\': %.3000s\n', 'sortDataFromDB', dataDict)
-            return dataDict
+            comps = list(set(map(lambda ping:  ping.compName, data)))
+            return  {comp: list(filter(lambda ping: ping.compName  == comp, data)) for comp in comps}
         except Exception as e:
             logger.error('In FUNCTION %s exception raised: %s',
                          'sortDataFromDB', e)
             raise
+class CompInfo(object):
+    def __init__(self, id, name, ping, time, status ):
+         self.id = id
+         self.name = name
+         self.ping = ping
+         self.time= time
+         self.status = status
+
+    def dictionary(self):
+        return {'id':str(self.id),
+                'name': self.name,
+                'ping':str(self.ping),
+                'time': self.time,
+                'status':self.status
+                }
+    
+ 

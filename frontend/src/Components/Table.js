@@ -49,10 +49,10 @@ class Table extends Component {
 
   handleData() {
     return this.props.data.map((item) => ({
-      status: item["status"],
-      ping: item["ping"],
-      name: item["name"],
-      id: item["id"],
+      status: item.status,
+      ping: item.ping,
+      name: item.name,
+      id: item.id,
     }));
   }
 
