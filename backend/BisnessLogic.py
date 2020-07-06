@@ -4,6 +4,7 @@ import config as conf
 import logging
 import pytz
 import json
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,6 +22,8 @@ class BLogic(object):
             logger.error('In FUNCTION %s exception raised: %s',
                          'createDataTableAndGraph', e)
             raise
+
+    
 
     def isAlive(self, time):
         try:
@@ -61,12 +64,14 @@ class BLogic(object):
             for compName in distComps.keys():
                 pingTimeArray = []
                 distComps[compName].sort(key=lambda x: x.time)
+                color = distComps[compName][0].color
                 for item in distComps[compName]:
                     pingTimeArray.append(
                         (item.pingValue, item.time.astimezone(pytz.utc)))
                 result.append(
                     {
                         "compName": compName,
+                        "color": color,
                         "pingTimeArrray": pingTimeArray
                     }
                 )

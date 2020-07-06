@@ -12,7 +12,7 @@ my_delay = 50
 
 while True:
     out = {
-        'hostname'  :   'DESKTOP-ADAM-TEST',
+        'hostname'  :   'DESKTOP-SOFA-TEST',
         'ping'      :   measure_latency(host=test_url,timeout=2.5)[0],
         'test_url'  :   test_url,
         'delay'     :   my_delay,

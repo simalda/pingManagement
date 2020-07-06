@@ -4,9 +4,7 @@ import "../CSS/graph.css";
 import * as moment from "moment";
 import { datePeriod } from "../JS/config";
 
-const r = 0;
-const g = 1;
-const b = 2;
+ 
 const pingValue = 0;
 var time = 1;
 
@@ -43,27 +41,6 @@ function createGraphData(props) {
   return chartData;
 }
 
-
-String.prototype.hashCode = function () {
-  var hash = 0;
-  if (this.length === 0) {
-    return hash;
-  }
-  for (var i = 0; i < this.length; i++) {
-    var char = this.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
-};
-function creatNewRGB(compName) {
-  return [
-    compName.hashCode() % 256,
-    (compName.hashCode() + 50) % 256,
-    (compName.hashCode() + 100) % 256,
-  ];
-}
-
 function getChartData(scale, dataSets) {
   var options = {
     scales: scale,
@@ -88,9 +65,6 @@ function getChartData(scale, dataSets) {
 function getDataSets(data, startDate) {
   let dataSets = [];
   data.forEach((item) => {
-    let rVal = creatNewRGB(item["compName"])[r];
-    let gVal = creatNewRGB(item["compName"])[g];
-    let bVal = creatNewRGB(item["compName"])[b];
     var dataForPing = [];
     const pointsAfterStart = item["pingTimeArrray"].filter(
         (datum) => moment(datum.x) >= startDate
@@ -105,8 +79,8 @@ function getDataSets(data, startDate) {
       label: item["compName"],
       fill: false,
       lineTension: 0.5,
-      backgroundColor: "rgba(75,192,192,1)",
-      borderColor: "rgba(" + rVal + "," + gVal + "," + bVal + ",0.5)",
+      backgroundColor: item["color"],
+      borderColor: item["color"],
       borderWidth: 2,
       data: dataForPing,
     });
@@ -128,13 +102,6 @@ function getStartDate(dateFilter) {
     return  moment().subtract(1, "hours");
   }
 }
-
-
-
-
-
-
-
 
 function getScales(dateFilter, dataSets,minDate) {
   if (dateFilter === datePeriod.AllDateOption) {
@@ -202,24 +169,5 @@ function getMinTime(allPoints){
     const minVal = Math.min(...xValues);
     return minVal;
 }
-// function getMaxY(fromWhereToStartTime, dataSets) {
-//   const mergedSeris = dataSets.map((dataset) => dataset.data).flat();
-//   const pointsAfterStart = mergedSeris.filter(
-//     (datum) => moment(datum.x) >= fromWhereToStartTime
-//   );
-//   const yValues = pointsAfterStart.map((point) => point.y);
-//   const maxVal = Math.max(...yValues);
-//   return maxVal;
-
-  //     const valuesInTimeRange = []
-  //     for (let i = 0; i < dataSets.length; i++){
-  //         for(let j = 0; j < dataSets[i].data.length; j++){
-  //             if ( dataSets[i].data[j]['x']  >= moment(fromWhereToStartTime).local().toISOString()) {
-  //                 valuesInTimeRange.push(dataSets[i].data[j][pingValue])
-  //             }
-  //         }
-  // }
-  // return Math.max(valuesInTimeRange)
-
 
 export default Graph;
