@@ -11,18 +11,21 @@ test_url = "www.facebook.com"
 my_delay = 50
 
 while True:
-    out = {
-        'hostname'  :   'DESKTOP-SOFA-TEST',
-        'ping'      :   measure_latency(host=test_url,timeout=2.5)[0],
-        'test_url'  :   test_url,
-        'delay'     :   my_delay,
-        'time'      :   datetime.now().strftime('%d/%m/%y %H:%M:%S')
-    }
+    try:
+        out = {
+            'hostname'  :   'DESKTOP-ADAM-TEST',
+            'ping'      :   measure_latency(host=test_url,timeout=2.5)[0],
+            'test_url'  :   test_url,
+            'delay'     :   my_delay,
+            'time'      :   datetime.now().strftime('%d/%m/%y %H:%M:%S')
+        }
 
-    request     =   requests.post(out_url,json=out)
-    result      =   json.loads(request.text)
-    my_delay     =   result['delay']
-    # test_url    =   result['test_url']
-    print('sent')
-            
+        request     =   requests.post(out_url,json=out)
+        result      =   json.loads(request.text)
+        my_delay     =   result['delay']
+        # test_url    =   result['test_url']
+        print('sent')
+    except Exception as e:
+        print('failed')
+        pass        
     time.sleep(my_delay) 

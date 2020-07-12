@@ -21,12 +21,14 @@ logging.basicConfig( level=logging.DEBUG, handlers=[handler],format='%(asctime)s
 
 logger = logging.getLogger(__name__)
 
+dataAccess = dataAccess()
+blItem = BLogic(dataAccess)
+
 @app.route('/createChartData')
-def create_chart_data():
-    try:
-        blItem = BLogic()
-        data = blItem.createDataTableAndGraph()
-        logger.info('%s how data looks  before you send it to front: %.3000s\n', '/createChartData',data )
+def create_chart_data( ):
+    try:        
+        data = blItem.createDataTableAndGraph( )
+        logger.info('%s how data looks  before you send it to front: %.3000s\n', '/createChartData', data)
         jsonData = jsonify({"TableData":data["TableData"],  "GraphData":data["GraphData"]})
         return jsonData
     except Exception as ex:
@@ -37,13 +39,12 @@ def create_chart_data():
 def pingercallback():
     try:
         data = json.loads(request.stream.read())
-        if not isPingerValid(data):
+        if not __isPingerValid(data):
             print('fuck %s', data)
             logger.error('pinger validation failed for %s', data)
             return json.dumps({'success': False}), 400, {'ContentType': 'application/json'}
         logger.info('%s how data looks  when it comes from client:%s\n', '/pinger', data )
-        sqlQuery = dataAccess()
-        sqlQuery.addNewPings(data)
+        dataAccess.addNewPings(data)
         logger.info('%s how data looks  before you send it back to client: %s\n', '/pinger', data )
         return jsonify({'delay': conf.delay_time})
     except Exception as ex:
@@ -53,14 +54,13 @@ def pingercallback():
 @app.route('/delete/<path:name>')
 def delete_comp(name):
     logger.info('%s how data looks  before you send it to db to delete:%s\n', '/delete', name )
-    sqlQuery = dataAccess()
-    if sqlQuery.deleteComp(name):   
+    if dataAccess.deleteComp(name):   
         return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
     return json.dumps({'success': False}), 500, {'ContentType': 'application/json'}
 
-def isPingerValid(data):
+def __isPingerValid(data):
     return data['ping'] and  type(data['ping']) == float and data['hostname'] and \
-        type (data['hostname']) == str
+        type (data['hostname']) == str 
 
 if __name__ == "__main__":
     app.run(port=5000)

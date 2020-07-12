@@ -1,5 +1,5 @@
 import mysql.connector
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import config as conf
 import logging
 import random
@@ -34,7 +34,7 @@ class dataAccess(object):
           mycursor = self.mydb.cursor()
           compName = data['hostname']#!??
           ping = data['ping']#!??
-          timeStem = datetime.now()
+          timeStem = datetime.now(timezone.utc)
           color = "rgba(" + str(math.floor(random.random() * 255)) + "," + str(math.floor(random.random() * 255)) + "," + str(math.floor(random.random() * 255)) + ",0.5)"
           args = [compName, ping, timeStem, color]
           logger.info('In FUNCTION %s data before insert: %s\n', 'addNewPings', args)
@@ -61,7 +61,7 @@ class dataAccess(object):
         mycursor = self.mydb.cursor()
         mycursor.execute("SELECT pings.id, pings.compName, pings.ping, pings.timeOfResponce, comps.lineColor FROM ping_management.pings INNER JOIN ping_management.comps ON ping_management.pings.compName = ping_management.comps.compName")
         allPingsTuples = mycursor.fetchall()
-        allPings = list(map(lambda ping: Ping(ping[0], ping[1], ping[2], ping[3], ping[4]),allPingsTuples) )
+        allPings = list(map(lambda ping: Ping(ping[0], ping[1], ping[2], ping[3].replace(tzinfo= timezone.utc), ping[4]),allPingsTuples) )
         return allPings
       except Exception as e:
           logger.error('In FUNCTION %s exception raised: %s', 'getAllPings', e)  

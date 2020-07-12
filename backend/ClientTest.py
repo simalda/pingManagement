@@ -11,18 +11,21 @@ test_url = "www.calorizator.ru"
 my_delay = 50
 
 while True:
-    out = {
-        'hostname'  :   socket.gethostname(),
-        'ping'      :   measure_latency(host=test_url,timeout=2.5)[0],
-        'test_url'  :   test_url,
-        'delay'     :   my_delay,
-        'time'      :   datetime.now().strftime('%d/%m/%y %H:%M:%S')
-    }
+    try:
+        out = {
+            'hostname'  :   'DESKTOP-SID-TEST',#socket.gethostname(),
+            'ping'      :   measure_latency(host=test_url,timeout=2.5)[0],
+            'test_url'  :   test_url,
+            'delay'     :   my_delay,
+            'time'      :   datetime.now().strftime('%d/%m/%y %H:%M:%S')
+        }
 
-    request     =   requests.post(out_url,json=out)
-    result      =   json.loads(request.text)
-    my_delay     =   result['delay']
-    # test_url    =   result['test_url']
-    print('sent')
-            
+        request     =   requests.post(out_url,json=out)
+        result      =   json.loads(request.text)
+        my_delay     =   result['delay']
+        # test_url    =   result['test_url']
+        print('sent')
+    except Exception as e:
+        print('failed')
+        pass         
     time.sleep(my_delay)

@@ -4,17 +4,19 @@ import config as conf
 import logging
 import pytz
 import json
+from datetime import timezone, datetime
 
 logger = logging.getLogger(__name__)
 
 
 class BLogic(object):
+    def __init__(self, dataAccess=''):
+        self.dataAccess = dataAccess
     
 
     def createDataTableAndGraph(self):
-        try:
-            s = dataAccess()
-            data = s.getAllPings()
+        try:  
+            data  = self.dataAccess.getAllPings()
             tableData = self.getTableData(data)
             graphData = self.getGraphData(data)
             return {"TableData": tableData,  "GraphData": graphData}
@@ -23,14 +25,11 @@ class BLogic(object):
                          'createDataTableAndGraph', e)
             raise
 
-    
-
     def isAlive(self, time):
         try:
-            isAlive = timedelta(
-                seconds=4*conf.delay_time).total_seconds() >= (datetime.now() - time).total_seconds()
-            logger.info(
-                'In FUNCTION %s data before \'return\': %s\n', 'isAlive', isAlive)
+            
+            isAlive = timedelta(seconds=4*conf.delay_time).total_seconds() >= (datetime.now(timezone.utc) - time).total_seconds()
+            logger.info('In FUNCTION %s data before \'return\': %s\n', 'isAlive', isAlive)
             return isAlive
         except Exception as e:
             logger.error('In FUNCTION %s exception raised: %s', 'isAlive', e)
@@ -44,7 +43,7 @@ class BLogic(object):
                 compName, pings = compNamePings
                 pings.sort(key=lambda ping: ping.time)
                 lastPing = pings[-1]
-                return CompInfo(
+                return CompTableInfo(
                     lastPing.id,
                     lastPing.compName,
                     lastPing.pingValue,
@@ -59,25 +58,20 @@ class BLogic(object):
 
     def getGraphData(self, data):
         try:
-            result = []
-            distComps = self.sortDataFromDB(data)
-            for compName in distComps.keys():
-                pingTimeArray = []
-                distComps[compName].sort(key=lambda x: x.time)
-                color = distComps[compName][0].color
-                for item in distComps[compName]:
-                    pingTimeArray.append(
-                        (item.pingValue, item.time.astimezone(pytz.utc)))
-                result.append(
-                    {
-                        "compName": compName,
-                        "color": color,
-                        "pingTimeArrray": pingTimeArray
-                    }
-                )
-            logger.info(
-                'In FUNCTION %s data before \'return\': %.3000s\n', 'getGraphData', result)
-            return result
+            dictComps = self.sortDataFromDB(data)
+
+            def getCompGraphData(compNamePings):
+                compName, pings = compNamePings
+                pings.sort(key=lambda ping: ping.time)
+                color = dictComps[compName][0].color
+                pingTimeArray = list(map(lambda item : (item.pingValue, item.time),pings))
+                return CompGraphInfo(
+                    compName,
+                    color,
+                    pingTimeArray
+                ).dictionary()
+            return list(map(getCompGraphData, dictComps.items()))
+
         except Exception as e:
             logger.error('In FUNCTION %s exception raised: %s',
                          'getGraphData', e)
@@ -85,13 +79,13 @@ class BLogic(object):
 
     def sortDataFromDB(self, data):
         try:
-            comps = list(set(map(lambda ping:  ping.compName, data)))
+            comps = set(map(lambda ping:  ping.compName, data))
             return  {comp: list(filter(lambda ping: ping.compName  == comp, data)) for comp in comps}
         except Exception as e:
             logger.error('In FUNCTION %s exception raised: %s',
                          'sortDataFromDB', e)
             raise
-class CompInfo(object):
+class CompTableInfo(object):
     def __init__(self, id, name, ping, time, status ):
          self.id = id
          self.name = name
@@ -107,4 +101,14 @@ class CompInfo(object):
                 'status':self.status
                 }
     
- 
+class CompGraphInfo(object):
+    def __init__(self, name, color, pingTimeArray):
+         self.name = name
+         self.color = color
+         self.pingTimeArray= pingTimeArray
+
+    def dictionary(self):
+        return { 'name': self.name,
+                'color':str(self.color),
+                "pingTimeArrray": self.pingTimeArray
+                }

@@ -28,7 +28,7 @@ function createGraphData(props) {
     props.data.forEach((item) => {
         item["pingTimeArrray"].forEach((item) => {
             allPoints.push({
-            x: item[time],
+            x:moment( item[time]),
             y: item[pingValue],
           });
         });})
@@ -76,7 +76,7 @@ function getDataSets(data, startDate) {
       });
     });
     dataSets.push({
-      label: item["compName"],
+      label: item["name"],
       fill: false,
       lineTension: 0.5,
       backgroundColor: item["color"],
@@ -95,7 +95,7 @@ function getStartDate(dateFilter) {
   else if (dateFilter === datePeriod.YearDateOption) {
     return  moment().subtract(365, "days");
   } else if (dateFilter === datePeriod.MonthDateOption) {
-    return moment().subtract(30, "days");
+    return moment().subtract(30, "days")
   } else if (dateFilter === datePeriod.DayDateOption) {
     return  moment().subtract(1, "days");
   } else if (dateFilter === datePeriod.HourDateOption) {
@@ -138,7 +138,7 @@ function getXAxis(unit, day, startDay) {
           day: day,
         },
         min: startDay,
-        max: Date.now(),
+        max: moment(Date.now())
       },
     },
   ];
