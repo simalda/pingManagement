@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class BLogic(object):
-    def __init__(self, dataAccess=''):
+    def __init__(self, dataAccess):
         self.dataAccess = dataAccess
     
 
