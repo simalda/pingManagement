@@ -8,8 +8,8 @@ from flask_cors import CORS
 from urllib.parse import urlparse
 
 import config as conf
-from DB import *
-from BisnessLogic import *
+from DB import dataAccess
+from BisnessLogic import BLogic
 
 app = Flask(__name__)
 app.debug = True

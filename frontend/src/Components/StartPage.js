@@ -6,6 +6,7 @@ import Table from "./Table";
 import Modal from "react-awesome-modal";
 import * as proxy from "../JS/proxy";
 import {datePeriod} from "../JS/config"
+import GraphData from "../JS/GraphData";
  
 class StartPage extends React.Component {
   constructor(props) {
@@ -30,14 +31,16 @@ class StartPage extends React.Component {
  
   updateData() {
     proxy.getChartData().then(
+     
       (result) =>{
+        let grData = new GraphData()
         this.setState({
           ...this.state,
           isLoadComplete: true,
           visible: false,
           deleteResult: "",
           data:  result["TableData"],
-          chartData: result["GraphData"],
+          chartData:   grData.createGraphData(result["GraphData"], this.state.DateFilter),
         })}).catch((error)=>   {
           if(typeof error.text === 'function'){
             error.text().then(erMes=> this.setState({ ...this.state, isError: true, status:erMes  }) 
@@ -46,8 +49,7 @@ class StartPage extends React.Component {
           else{
           this.setState({ ...this.state, isError: true, status:error.toString() })    }
               })
-            }
-  
+            }  
  
 
  myTimer() {
@@ -75,8 +77,7 @@ class StartPage extends React.Component {
           else{
           this.setState({ ...this.state, isError: true, status:error.toString() })    }
               })
-            } 
- 
+            }  
 
   closeModal() {
     this.updateData();
@@ -122,7 +123,7 @@ class StartPage extends React.Component {
         <div>
           <Graph
             data={this.state.chartData}
-            DateFilter={this.state.DateFilter}
+            // DateFilter={this.state.DateFilter}
           ></Graph>
           <div className="timeFrame">
             &nbsp;

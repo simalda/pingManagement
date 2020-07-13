@@ -1,10 +1,9 @@
 from collections import namedtuple
-from DB import *
+from DB import dataAccess
 import config as conf
 import logging
-import pytz
 import json
-from datetime import timezone, datetime
+from datetime import timezone, datetime, timedelta
 
 logger = logging.getLogger(__name__)
 

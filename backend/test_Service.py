@@ -3,8 +3,7 @@ import tempfile
 
 import pytest
 
-from flaskr import flaskr
-
+ 
 
 @pytest.fixture
 def client():
@@ -24,4 +23,3 @@ def test_empty_db(client):
 
     rv = client.get('/')
     assert b'No entries here so far' in rv.data
-    
