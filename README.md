@@ -2,7 +2,7 @@
 Online quizes on several languages: Python, React, mySQL
 Client can see ping's values on graph and  status if connected on table. 
 
-![alt text](./images/horIm.jpg)
+![alt text](./images/hourIm.jpg)
 
  
 
