@@ -1,25 +1,23 @@
-# Quiz
-Online quizes on several languages: Python, React, SQL
-User can chose the number of questions in quiz.
-While redoing the same quiz questions will change ( in contrast to all quizes I did)
+# Ming managment 
+Online quizes on several languages: Python, React, mySQL
+Client can see ping's values on graph and  status if connected on table. 
 
-![alt text](./ping_management/images/horIm.jpg)
+![alt text](./images/horIm.jpg)
 
-![alt text](./frontend/WhatIHave/quizPage.jpg)
-
+ 
 
 # Getting Started
 Create folder on your computer install git and pull from git.
-git creat new folder named Quiz
+git create new folder named --NAME--
 
 Install python3 with Flask module, nodejs  and npm if needed
 
-install packages: ../Quiz/frontend/quiz# npm install
+install packages: ../ping_management/frontend npm install
 
-go to ../Quiz/frontend/quiz/src
+go to ../ping_management/frontend
 and run npm start
 
-go to ../Quiz/backend
+go to ../ping_management/backend>
 py3 ./Service.py
 
  
