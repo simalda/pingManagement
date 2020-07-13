@@ -3,7 +3,7 @@ Online quizes on several languages: Python, React, SQL
 User can chose the number of questions in quiz.
 While redoing the same quiz questions will change ( in contrast to all quizes I did)
 
-![alt text](./frontend/WhatIHave/logIn.jpg)
+![alt text](./ping_management/images)
 
 ![alt text](./frontend/WhatIHave/quizPage.jpg)
 
