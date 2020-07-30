@@ -84,7 +84,7 @@ test("Check that getMaxY bring the max ping value", () => {
     expect(moment().subtract(1, "days")-res < 5).toBeTruthy();
   });
 
-  test("Check that getStartDAy bring keast date 'ALL' filter ", () => {
+  test("Check that getStartDAy bring least date  for'ALL' filter ", () => {
     const gd = new GraphData();
     let res = gd.getStartDate('ALL');
     expect(res).toEqual(moment("Mon, 13 Jul 2020 12:27:36 GMT"));

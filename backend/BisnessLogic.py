@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class BLogic(object):
-    def __init__(self, dataAccess):
+    def __init__(self, dataAccess, config):
         self.dataAccess = dataAccess
-    
+        self.config = config
 
     def createDataTableAndGraph(self):
         try:  
@@ -26,8 +26,7 @@ class BLogic(object):
 
     def isAlive(self, time):
         try:
-            
-            isAlive = timedelta(seconds=4*conf.delay_time).total_seconds() >= (datetime.now(timezone.utc) - time).total_seconds()
+            isAlive = timedelta(seconds=4*self.config.get_delay_time()).total_seconds() >= (datetime.now(timezone.utc) - time).total_seconds()
             logger.info('In FUNCTION %s data before \'return\': %s\n', 'isAlive', isAlive)
             return isAlive
         except Exception as e:

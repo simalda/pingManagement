@@ -1,0 +1,7 @@
+{"mysql":{
+    "host": "localhost",
+    "user":"sofa",
+    "password":"123456bB",
+    "database":"ping_management2"
+},
+"delay_time":1000}
