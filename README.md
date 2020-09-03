@@ -1,4 +1,4 @@
-# Ming managment 
+# Ping managment 
 Online quizes on several languages: Python, React, mySQL
 Client can see ping's values on graph and  status if connected on table. 
 
@@ -18,7 +18,7 @@ go to ../ping_management/frontend
 and run npm start
 
 go to ../ping_management/backend>
-py3 ./Service.py
+py ./Service.py
 
   
 ## Installing
