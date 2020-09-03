@@ -52,7 +52,7 @@ For backend tests go to
 ../ping_management/backend
 and write: pytest
 
-# Deployment!
+ 
  
 # Built With
 - React.js - The web framework used
