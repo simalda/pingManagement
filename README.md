@@ -1,6 +1,8 @@
 # Ping managment 
-Online quizes on several languages: Python, React, mySQL
-Client can see ping's values on graph and  status if connected on table. 
+System to manage computers connection. The system reflect ping values on graph and show which computers are disconnected from internet.
+
+System gets from every computer   request with ping value , if there not request from some compuret for 4*requestInterval time 
+then computer displayed as disconnected.
 
 ![alt text](./images/hourIm.jpg)
 
